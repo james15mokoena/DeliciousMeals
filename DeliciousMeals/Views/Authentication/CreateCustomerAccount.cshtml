@@ -1,0 +1,30 @@
+﻿@model DeliciousMeals.Models.Customer;
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="container text-center">
+
+    <h1 class="display-6">Create an Account</h1>
+
+    <form class="form mt-4" method="post" asp-action="CreateCustomerAccountHelper">
+
+        <label for="FirstName" class="form-label">First Name:</label>
+        <input asp-for="FirstName" type="text" class="form-control" id="FirstName" required/>
+        <br />
+        <label for="LastName" class="form-label">Last Name:</label>
+        <input asp-for="LastName" type="text" class="form-control" id="LastName" required />
+        <br />
+        <label for="Email" class="form-label">Email:</label>
+        <input asp-for="Email" type="email" class="form-control" id="Email" required />
+        <br />
+        <label for="Phone" class="form-label">Phone:</label>
+        <input asp-for="Phone" type="tel" class="form-control" id="Phone" required />
+        <br />
+        <label for="Password" class="form-label">Password:</label>
+        <input asp-for="Password" type="text" class="form-control" id="Password" required />
+        <br />
+        <button class="btn btn btn-primary" type="submit">Create Account</button>
+    </form>
+
+</div>

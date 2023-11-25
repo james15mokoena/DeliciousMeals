@@ -1,28 +1,47 @@
 using DeliciousMeals.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using DeliciousMeals.Data;
 
 namespace DeliciousMeals.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly DeliciousMealsDbContext dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(DeliciousMealsDbContext dbContext)
         {
-            _logger = logger;
+            this.dbContext = dbContext;
         }
 
         public IActionResult Index()
         {
+            if (HttpContext.Session.Get("email") != null)
+            {                
+                ViewData["IsLogged"] = "yes";
+            }
+            else
+            {                
+                ViewData["IsLogged"] = null;
+            }
+
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult DisplayMenu()
         {
+            if (HttpContext.Session.Get("email") != null)
+            {             
+                ViewData["IsLogged"] = "yes";
+            }
+            else
+            {             
+                ViewData["IsLogged"] = null;
+            }
+
             return View();
         }
-
+      
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

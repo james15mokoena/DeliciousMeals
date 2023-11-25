@@ -29,5 +29,9 @@ namespace DeliciousMeals.Models
         [Required]
         [DataType(DataType.PhoneNumber)]
         public required string Phone { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        public required string Password { get; set; }
     }
 }

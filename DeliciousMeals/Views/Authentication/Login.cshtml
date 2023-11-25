@@ -1,0 +1,33 @@
+﻿@model DeliciousMeals.Models.Customer;
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container text-center">
+
+    <h1 class="display-6"> Login </h1>
+
+    <form class="form mt-5" method="get" asp-action="LoginVerification">
+
+        <label for="Email" class="form-label">Email:</label>        
+        <input asp-for="Email" class="form-control" type="text" id="Email" required />
+        <br/>
+        <label for="Password" class="form-label">Password:</label>        
+        <input asp-for="Password" class="form-control" type="password" id="Password" required />
+        <br />
+        <button class="btn btn-primary mt-3 mb-3" type="submit">Login</button>
+        <br/>
+        <a asp-controller="Authentication" asp-action="CreateCustomerAccount">Create Account</a>
+    </form>    
+    <br/>
+
+    @{
+        if(TempData.ContainsKey("ErrorMessage"))
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+    }
+
+</div>

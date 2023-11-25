@@ -30,6 +30,10 @@ namespace DeliciousMeals.Models
         [DataType(DataType.PhoneNumber)]
         public required string Phone { get; set; }
 
+        [Required]
+        [DataType(DataType.Password)]
+        public required string Password { get; set; }
+
         // Navigation properties
         public ICollection<Cart>? CartItems { get; set; }
 
