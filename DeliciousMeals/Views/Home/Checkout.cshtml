@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Checkout";      
+}
+
+<div class="container text-center">
+
+    <h1 class="display-5"> Payment Details</h1>
+    
+    <form class="form" method="get" asp-controller="Home" asp-action="Order">
+
+        <div class="container text-start col-6">
+
+            <select class="form-select mt-5" required>
+                <option value="Bank">Bank</option>
+                <option value="Absa">Absa</option>
+                <option value="Capitec">Capitec</option>
+                <option value="Standard Bank">Standard Bank</option>
+                <option value="FNB">FNB</option>
+                <option value="Nedbank">Nedbank</option>
+            </select>
+
+            <label for="cardNo" class="form-label mt-3">Card Number: </label>
+            <input id="cardNo" class="form-control" type="number" required/>
+            <label for="cvvNo" class="form-label mt-3">CVV: </label>
+            <input id="cvvNo" class="form-control" type="number" required/>
+            <label for="dateExpires" class="form-label mt-3">Expiring Date: </label>
+            <input id="dateExpires" class="form-control" type="date" required/>
+            <button type="submit" class="btn btn-outline-primary mt-4" style="margin-left:40%;font-size:20px">Place Order</button>
+        </div>
+        
+    </form>
+
+</div>

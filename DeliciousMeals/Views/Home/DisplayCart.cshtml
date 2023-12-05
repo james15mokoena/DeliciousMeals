@@ -1,0 +1,101 @@
+﻿@model IList<DeliciousMeals.Models.Cart>
+
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@{
+    if(TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    if(TempData["Notification"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Notification"]
+        </div>
+    }
+
+    if(TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container text-center">
+            
+            <h1 class="display-5 text-center"> Your Cart</h1>
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Total Price (ZAR)</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        foreach (Cart cartItem in Model)
+                        {
+                            if (cartItem != null)
+                            {
+                                <tr>
+                                    <td><a asp-controller="Home" asp-action="DecreaseMealQuantity" asp-route-MealId="@cartItem.MealId" role="button" class="btn btn-warning" style="width:83px;height:39px;"><span style="font-size:22px;">-</span></a></td>
+                                    <td></td>@*@cartItem.Meal.Name*@
+                                    <td><img src="" width="100" height="90" alt="" /></td>@*~/@cartItem.Meal.Image , @cartItem.Meal.Name*@
+                                    <td>@cartItem.Quantity</td>
+                                    <td>@cartItem.Price</td>
+                                    <td><a asp-controller="Home" asp-action="IncreaseMealQuantity" asp-route-MealId="@cartItem.MealId" role="button" class="btn btn-success" style="width:83px;height:39px;"><span style="font-size:22px;">+</span></a></td>
+                                    <td><a asp-controller="Home" asp-action="DeleteMealFromCart" asp-route-MealId="@cartItem.MealId" role="button" class="btn btn-danger">Remove</a></td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="container text-center">
+
+                @{
+
+                    decimal grandTotal = 0;
+                    int numCartItems = 0;
+
+                    foreach(Cart cartItem in Model)
+                    {
+                        if(cartItem != null)
+                        {
+                            ++numCartItems;
+                            grandTotal += (cartItem.Price * cartItem.Quantity);
+                        }
+                    }
+
+                    <h6 style="font-weight:bold;"> Grand Total: <span style="font-weight:normal">@grandTotal</span></h6>
+                    ViewData["NumCartItems"] = numCartItems.ToString();                
+                }
+
+            </div>
+
+            <div class="container text-center mt-5">
+            
+                <a asp-controller="Home" asp-action="Checkout" role="button" class="btn btn-outline-success" style="border-radius:5px;"> Proceed to Checkout</a>
+                
+            </div>
+
+        </div>
+        
+    }
+}

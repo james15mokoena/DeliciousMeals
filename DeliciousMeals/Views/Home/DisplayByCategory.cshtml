@@ -1,0 +1,27 @@
+﻿@model IList<DeliciousMeals.Models.Meal>;
+@{
+    ViewData["Title"] = "Meals by Category";
+}
+
+<div class="container text-center mt-3">
+
+    <h1 class="display-5 mb-4">Meals by Category</h1>
+
+    <div class="row row-cols-4">
+
+        @{
+
+            foreach (Meal meal in Model)
+            {
+                if (meal != null)
+                {
+                    <div class="col-12 col-md-3 m-3 text-center">
+                        <a asp-controller="Home" asp-action="DisplayMeal" asp-route-MealId="@meal.MealId"><img src="~/@meal.Image" alt="@meal.Name" width="250" height="250" /></a>
+                    </div>
+                }
+            }
+        }
+
+    </div>
+
+</div>

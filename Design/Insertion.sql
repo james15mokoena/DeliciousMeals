@@ -1,0 +1,20 @@
+INSERT INTO Meal VALUES('Fish and Chips','A tasty fish and chips.',40,10,'images/meals/fish_and_chips.jpg','y','Fish and Chips','medium');
+INSERT INTO Meal VALUES('Fish','A tasty fish.',30.5,10,'images/meals/fish.jpg','y','Fish','medium');
+INSERT INTO Meal VALUES('Cheese Burger','A tasty cheese burger.',35,10,'images/meals/cheese-burger.jpg','y','Burger','large');
+INSERT INTO Meal VALUES('Smoked Burger','A tasty smoked burger.',34.5,10,'images/meals/smoked-burger.jpg','y','Burger','small');
+INSERT INTO Meal VALUES('Veggie Burger','A tasty veggie burger.',28,10,'images/meals/veggie-burger.jpg','y','Burger','small');
+INSERT INTO Meal VALUES('French Salad','A tasty french salad.',25,10,'images/meals/french-salad.jpeg','y','Vegetarian','small');
+INSERT INTO Meal VALUES('Fried Chicken','A tasty fried chicken.',55.50,10,'images/meals/fried-chicken.jpg','y','Chicken','medium');
+INSERT INTO Meal VALUES('Greek Salad','A tasty greek salad.',28.70,10,'images/meals/greek-salad.jpg','y','Vegetarian','medium');
+INSERT INTO Meal VALUES('Coca Cola Soft Drink Can','A sweet canned coke.',10,10,'images/meals/canned-coke.jpg','y','Beverages','small');
+INSERT INTO Meal VALUES('Coca Cola Coke Pack','A sweet small bottle coke.',10,10,'images/meals/small-bottle-coke.jpeg','y','Beverages','small');
+INSERT INTO Meal VALUES('Coca Cola 1 litre','A sweet 1 litre soft drink.',10,10,'images/meals/1lt-bottle-coke.jpg','y','Beverages','medium');
+INSERT INTO Meal VALUES('Coca Cola 2 litre','A sweet 2 litre soft drink.',25,10,'images/meals/2lt-bottle-coke.jpg','y','Beverages','large');
+INSERT INTO Meal VALUES('Fanta Sparkling Can','A sweet fanta sparkling can.',10,10,'images/meals/fanta-sparkling-can.jpg','y','Beverages','small');
+INSERT INTO Meal VALUES('Fanta Sparkling Orange Flavoured Drink 2 L','A sweet fanta sparkling orange.',25,10,'images/meals/Fanta Sparkling Orange Flavoured Drink 2 L.jpg','y','Beverages','large');
+INSERT INTO Meal VALUES('Crisp Small Chips','A tasty small chips.',15,10,'images/meals/small-chips.jpg','y','Chips','small');
+INSERT INTO Meal VALUES('Crisp Medium Chips','A tasty medium chips.',18,10,'images/meals/medium-chips.jpg','y','Chips','medium');
+INSERT INTO Meal VALUES('Fried Chips','A tasty large chips.',20,10,'images/meals/fried-chips.jpg','y','Chips','large');
+INSERT INTO Meal VALUES('Bunny Chow','A tasty small bunny chow',15,10,'images/meals/kota.jpg','y','Combos','small');
+
+select * from Cart;

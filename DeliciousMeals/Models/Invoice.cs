@@ -12,8 +12,10 @@ namespace DeliciousMeals.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int InvoiceId { get; set; }
 
+        // A Customer' email.
         [Required]
-        public int CustId { get; set; }
+        [DataType(DataType.EmailAddress)]
+        public required string Email { get; set; }
 
         [Required]
         public int MealId { get; set; }
@@ -31,7 +33,7 @@ namespace DeliciousMeals.Models
 
         // Reference/Navigation property
         [Required]
-        [ForeignKey("CustId")]
+        [ForeignKey("Email")]
         public required Customer Customer { get; set; }
 
         [Required]

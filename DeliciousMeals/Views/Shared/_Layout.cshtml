@@ -28,14 +28,70 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="anchors links nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>                        
+                            <a class="anchors nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>                          
                         <li class="nav-item">
-                            <a class="anchors links nav-link text-white" asp-controller="Home" asp-action="DisplayMenu">Menu</a>
+                            <div class="dropdown">
+                                <a class="anchors nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" 
+                                asp-controller="Home" asp-action="DisplayMenu">Menu</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="chicken">Chicken</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="vegetarian">Vegetarian</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="fish">Fish</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="burger">Burgers</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="chips">Chips</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="Fish and Chips">Fish & Chips</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="combos">Combos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="beverages">Beverages</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="sauces">Sauces</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="familymeals">Family Meals</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="DisplayByCategory" asp-route-Category="extras">Extras</a></li>
+                                </ul>
+                            </div>
                         </li>
-                    </ul>
+                        <li class="nav-item">
+                            <a class="anchors nav-link text-white" asp-controller="Home" asp-action="DisplayCart">Cart
+                                
+                                @{
+                                    if(ViewData["NumCartItems"] != null)
+                                    {
+                                        <span>[@ViewData["NumCartItems"]]</span>    
+                                    }
+                                    else
+                                    {
+                                        <span>[0]</span>
+                                    }
+                                }
+                            </a>
+                        </li>
+                        @{
+                            if (ViewData["IsLogged"] != null)
+                            {
+                                string? logged = (string?)ViewData["IsLogged"];
+                                if (logged != null && logged == "yes")
+                                { 
+                                    <li class="nav-item">
+                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="DisplayInvoice">Invoice</a>
+                                    </li>
+                                }
+                            }                            
+                        }
+                        @{
+                            if (ViewData["IsLogged"] != null)
+                            {
+                                string? logged = (string?)ViewData["IsLogged"];
+                                if (logged != null && logged == "yes")
+                                {
+                                    <li class="nav-item">
+                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="TempOrder">Orders</a>
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>                   
                 </div>
-                <div class="navbar-collapse collapse">                                            
+             
+                <div class="navbar-collapse collapse justify-content-end">                                            
                                              
                     @{
                        if(ViewData["IsLogged"] != null)
@@ -43,12 +99,12 @@
                             string? logged = (string?) ViewData["IsLogged"];
                             if(logged != null && logged == "yes")
                             {
-                                <a class="anchors nav-link text-white" asp-controller="Authentication" asp-action="Logout">Logout</a>
+                                <a class="anchors nav-link text-white ml-5" asp-controller="Authentication" asp-action="Logout">Logout</a>
                             }
                         }
                         else
                         {
-                            <a class="anchors nav-link text-white" asp-controller="Authentication" asp-action="Login">Login</a>
+                            <a class="anchors nav-link text-white ml-5" asp-controller="Authentication" asp-action="Login">Login</a>
                         }
                     }                    
                 </div>

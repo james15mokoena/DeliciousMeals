@@ -2,6 +2,7 @@
 using DeliciousMeals.Data;
 using DeliciousMeals.Models;
 using Microsoft.EntityFrameworkCore;
+using DeliciousMeals.Security;
 
 namespace DeliciousMeals.Controllers
 {

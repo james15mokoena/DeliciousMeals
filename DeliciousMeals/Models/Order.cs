@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DeliciousMeals.Models
 {
@@ -10,8 +11,10 @@ namespace DeliciousMeals.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
 
+        // A Customer' email.
         [Required]
-        public int CustId { get; set; }
+        [DataType(DataType.EmailAddress)]
+        public required string Email { get; set; }
 
         [Required]
         public int MealId { get; set; }
@@ -28,13 +31,13 @@ namespace DeliciousMeals.Models
         [Column(TypeName = "char(1)")]
         public char IsCollected { get; set; }
 
-        [Required]
+        [AllowNull]
         [DataType(DataType.Time)]
         public DateTime TimeCompleted { get; set; }
 
         // Reference/Navigation property
         [Required]
-        [ForeignKey("CustId")]
+        [ForeignKey("Email")]
         public required Customer Customer { get; set; }
 
         [Required]

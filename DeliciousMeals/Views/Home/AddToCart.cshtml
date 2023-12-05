@@ -1,0 +1,12 @@
+﻿@model DeliciousMeals.Models.Meal;
+
+@{
+    ViewData["Title"] = "Add to Cart";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }  
+}

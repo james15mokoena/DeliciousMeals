@@ -1,0 +1,69 @@
+﻿@model IList<DeliciousMeals.Models.Order>
+
+@{
+    ViewData["Title"] = "Order";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+
+    if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+}
+
+<div class="container">
+    
+    @if(Model != null)
+    {
+        <h1 class="display-5 text-center"> Track your order.</h1>
+
+        <div class="container text-center mt-5">
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Order Id</th>
+                        <th>Meal Id</th>
+                        <th>Date Ordered</th>
+                        <th>Is Ready?</th>
+                        <th>Is Collected?</th>
+                        <th>Time Completed</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                    
+                        foreach (Order order in Model)
+                        {
+                            if (order != null)
+                            {
+                                <tr>
+                                    <td>@order.OrderId</td>
+                                    <td>@order.MealId</td>
+                                    <td>@order.DateOrdered</td>
+                                    <td>@order.IsReady</td>
+                                    <td>@order.IsCollected</td>
+                                    <td>@order.TimeCompleted</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+     }             
+
+</div>

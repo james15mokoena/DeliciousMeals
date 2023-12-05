@@ -1,0 +1,26 @@
+﻿@model DeliciousMeals.Models.Meal;
+@{
+    ViewData["Title"] = "Meal";
+}
+
+<div class="container text-center mt-4">
+
+    <h1 class="display-5 text-center mb-3">@Model.Name</h1>
+
+    <img src="~/@Model.Image" alt="@Model.Name" width="280" height="280" /> <br/>
+
+    <div class="container text-center mt-4">
+
+        <p> @Model.Description </p>
+        <p><span>R</span>@Model.Price</p>
+    </div>
+
+    <div class="container text-center mt-4">
+        
+        <a asp-controller="Home" asp-action="Reviews" asp-route-MealId="@Model.MealId" role="button" class="btn btn-success">Reviews</a>        
+
+        <a asp-controller="Home" asp-action="AddToCart" asp-route-MealId="@Model.MealId" role="button" class="btn btn-primary">Add to Cart</a>
+
+    </div>
+
+</div>

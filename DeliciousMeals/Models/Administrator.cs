@@ -6,11 +6,12 @@ namespace DeliciousMeals.Models
     // Represents the Administrator table.
     [Table("Administrator")]
     public class Administrator
-    {
-        // A primary key and unique identifier for the Administrator.
+    {       
+        // The admin's email address.
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustId { get; set; }
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public required string Email { get; set; }
 
         // The first name of the admin.
         [Required]
@@ -18,12 +19,7 @@ namespace DeliciousMeals.Models
 
         // The last name of the admin.
         [Required]
-        public required string LastName { get; set; }
-
-        // The admin's email address.
-        [Required]
-        [DataType(DataType.EmailAddress)]
-        public required string Email { get; set; }
+        public required string LastName { get; set; }      
 
         // The admin's phone number.
         [Required]

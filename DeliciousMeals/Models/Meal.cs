@@ -39,6 +39,14 @@ namespace DeliciousMeals.Models
         [Column(TypeName = "char(1)")]
         public char IsAvailable { get; set; }
 
+        // Indicates the size of the meal.
+        [Required]
+        public required string Size { get; set; }
+
+        // Meal category.
+        [Required]
+        public required string Category { get; set; }
+
         // Navigation properties.
         public ICollection<Cart>? Carts { get; set; }
 

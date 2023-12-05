@@ -12,13 +12,14 @@ namespace DeliciousMeals.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CartId { get; set; }
 
-        // A Customer' id.
+        // A Customer' email.
         [Required]
-        public int CustId { get; set; }
+        [DataType(DataType.EmailAddress)]
+        public required string Email { get; set; }
 
         // A meal's id.
         [Required]
-        public int MealId { get; set; }
+        public int MealId { get; set; }        
 
         // A meal's quantity on the cart.
         [Required]
@@ -31,7 +32,7 @@ namespace DeliciousMeals.Models
 
         // Reference/Navigation property
         [Required]
-        [ForeignKey("CustId")]
+        [ForeignKey("Email")]
         public required Customer Customer { get; set; }
 
         [Required]

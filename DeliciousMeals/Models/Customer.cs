@@ -6,11 +6,12 @@ namespace DeliciousMeals.Models
     // Represents the Customer's table.
     [Table("Customer")]
     public class Customer
-    {
-        // A primary key and a unique identifier for the customer.
+    {      
+        // A customer's email address
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustId { get; set; }
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public required string Email { get; set; }
 
         // A customer's first name 
         [Required]
@@ -18,14 +19,9 @@ namespace DeliciousMeals.Models
 
         // A customer's last name
         [Required]
-        public required string LastName { get; set; }
+        public required string LastName { get; set; }        
 
-        // A customer's email address
-        [Required]
-        [DataType(DataType.EmailAddress)]
-        public required string Email { get; set; }
-
-        // A customer's phone number
+        // A customer's phone number        
         [Required]
         [DataType(DataType.PhoneNumber)]
         public required string Phone { get; set; }
