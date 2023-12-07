@@ -19,7 +19,13 @@ namespace DeliciousMeals.Models
 
         // A meal's id.
         [Required]
-        public int MealId { get; set; }        
+        public int MealId { get; set; }
+
+        [Required]
+        public required string MealName { get; set; }
+
+        [Required]
+        public required string MealImg { get; set; }
 
         // A meal's quantity on the cart.
         [Required]

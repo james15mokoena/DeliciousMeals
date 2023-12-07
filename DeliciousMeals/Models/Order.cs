@@ -20,6 +20,9 @@ namespace DeliciousMeals.Models
         public int MealId { get; set; }
 
         [Required]
+        public required string MealName { get; set; }
+
+        [Required]
         [DataType(DataType.DateTime)]
         public DateTime DateOrdered { get; set; }
 
@@ -33,7 +36,7 @@ namespace DeliciousMeals.Models
 
         [AllowNull]
         [DataType(DataType.Time)]
-        public DateTime TimeCompleted { get; set; }
+        public DateTime? TimeCompleted { get; set; }
 
         // Reference/Navigation property
         [Required]

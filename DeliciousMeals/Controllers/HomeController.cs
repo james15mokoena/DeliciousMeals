@@ -3,16 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using DeliciousMeals.Data;
 using Microsoft.EntityFrameworkCore;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 
 namespace DeliciousMeals.Controllers
 {
     public class HomeController : Controller
     {
         private readonly DeliciousMealsDbContext dbContext;
+        private readonly IConverter converter;
 
-        public HomeController(DeliciousMealsDbContext dbContext)
+        public HomeController(DeliciousMealsDbContext dbContext, IConverter converter)
         {
             this.dbContext = dbContext;
+            this.converter = converter; 
         }
 
         public async Task<IActionResult> Index()
@@ -86,9 +90,17 @@ namespace DeliciousMeals.Controllers
                     string email = new(emailArray);
 
                     var cartMeal = await dbContext.Carts.FirstOrDefaultAsync(m => m.MealId == mealId && m.Email == email);
+                    var meal = await dbContext.Meals.FirstOrDefaultAsync(m=> m.MealId == mealId);
 
-                    if (cartMeal != null)
+                    if (cartMeal != null && meal != null)
                     {
+                        meal.Quantity += cartMeal.Quantity;
+
+                        if (meal.Quantity > 0)
+                        {
+                            meal.IsAvailable = 'Y';
+                        }
+                        dbContext.Meals.Update(meal);
                         dbContext.Carts.Remove(cartMeal);
                         await dbContext.SaveChangesAsync();
                         return RedirectToAction("DisplayCart", "Home");
@@ -119,14 +131,23 @@ namespace DeliciousMeals.Controllers
                     string email = new(emailChars);
 
                     var cartItem = await dbContext.Carts.FirstOrDefaultAsync(item => item.MealId == mealId && item.Email == email);
+                    var meal = await dbContext.Meals.FirstOrDefaultAsync(m => m.MealId == mealId);
 
-                    if (cartItem != null)
+                    if (cartItem != null && meal != null)
                     {
                         int quantity = cartItem.Quantity;
 
                         if(quantity - 1 > 0)
                         {
                             cartItem.Quantity -= 1;
+                            meal.Quantity += 1;
+
+                            if (meal.Quantity > 0)
+                            {
+                                meal.IsAvailable = 'Y';
+                            }
+
+                            dbContext.Meals.Update(meal);
                             dbContext.Update(cartItem);
                             await dbContext.SaveChangesAsync();
                             return RedirectToAction("DisplayCart", "Home");
@@ -168,9 +189,17 @@ namespace DeliciousMeals.Controllers
                     {
                         int quantity = cartItem.Quantity;                        
 
-                        if ((quantity + 1) <= meal.Quantity)
+                        if ((quantity + 1) <= meal.Quantity || meal.Quantity > 0)
                         {
                             cartItem.Quantity += 1;
+                            meal.Quantity -= 1;
+
+                            if (meal.Quantity <= 0)
+                            {
+                                meal.IsAvailable = 'N';
+                            }
+
+                            dbContext.Meals.Update(meal);
                             dbContext.Update(cartItem);
                             await dbContext.SaveChangesAsync();
                             return RedirectToAction("DisplayCart", "Home");
@@ -193,8 +222,7 @@ namespace DeliciousMeals.Controllers
             if (HttpContext.Session.Get("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
-
-                var meal = await dbContext.Meals.FirstOrDefaultAsync(meal => meal.MealId == mealId);
+                
                 byte[]? emailBytes = HttpContext.Session.Get("email");   
 
                 if(emailBytes != null)
@@ -207,11 +235,11 @@ namespace DeliciousMeals.Controllers
                     }
 
                     string email = new (emailArray);
-
+                    var meal = await dbContext.Meals.FirstOrDefaultAsync(meal => meal.MealId == mealId);
                     var cartItem = await dbContext.Carts.FirstOrDefaultAsync(cItem => cItem.MealId == mealId && cItem.Email == email);
-                    var customer = await dbContext.Customers.FirstOrDefaultAsync(cust => cust.Email == email);
+                    var customer = await dbContext.Customers.FirstOrDefaultAsync(cust => cust.Email == email);                    
 
-                    if (meal != null && meal.IsAvailable == 'y' && email != null && mealId != null && cartItem == null && customer != null)
+                    if (meal != null && meal.IsAvailable == 'Y' && email != null && mealId != null && cartItem == null && customer != null)
                     {
 
                         Cart newCartItem = new() 
@@ -221,9 +249,19 @@ namespace DeliciousMeals.Controllers
                             Quantity = 1,
                             Price = meal.Price,
                             Customer = customer,
-                            Meal = meal
+                            Meal = meal,
+                            MealName = meal.Name,
+                            MealImg = meal.Image
                         };
+                        
+                        meal.Quantity -= 1;
 
+                        if (meal.Quantity <= 0)
+                        {
+                            meal.IsAvailable = 'N';
+                        }
+                       
+                        dbContext.Meals.Update(meal);                        
                         await dbContext.Carts.AddAsync(newCartItem);
                         await dbContext.SaveChangesAsync();
                         return RedirectToAction("DisplayCart", "Home");
@@ -333,7 +371,7 @@ namespace DeliciousMeals.Controllers
             return View();
         }
 
-        public IActionResult DisplayInvoice()
+        public async Task<IActionResult> DisplayInvoice()
         {
             if(HttpContext.Session.Get("email") != null)
             {
@@ -361,7 +399,7 @@ namespace DeliciousMeals.Controllers
                         }
 
                         if (count > 0)
-                            TempData["Response"] = "You have an invoice.";
+                            return View(await invoices.ToListAsync());
                         else
                             TempData["Response"] = "You don't have an invoice.";
                     }
@@ -455,49 +493,50 @@ namespace DeliciousMeals.Controllers
                         {                                               
                             if (item != null)
                             {                                
-                                Order newOrder = new Order
+                                Order newOrder = new ()
                                 {
                                     MealId = item.MealId,
-                                    IsReady = 'n',
-                                    IsCollected = 'n',
-                                    TimeCompleted = DateTime.Now,
+                                    IsReady = 'N',
+                                    IsCollected = 'N',
+                                    TimeCompleted = null,
                                     DateOrdered = DateTime.Now,
                                     Email = email,
                                     Customer = customer,
-                                    Meal = item.Meal
+                                    Meal = item.Meal,
+                                    MealName = item.MealName                                   
                                 };
 
                                 dbContext.Orders.Add(newOrder);                                                               
                             }
                         }
-
-                        var meals = dbContext.Meals.Where(m => m.IsAvailable == 'y');
-
-                        if(meals != null)
+       
+                        foreach (Cart item in cartItems)
                         {
-                            foreach(Cart cartItem in cartItems)
-                            {                                                                            
-                                foreach(Meal meal in meals)
+                            if (item != null)
+                            {
+                                Invoice newInv = new()
                                 {
-                                    if(cartItem != null && meal != null)
-                                    {
-                                        if(cartItem.MealId == meal.MealId)
-                                        {
-                                            meal.Quantity -= cartItem.Quantity;
-                                            dbContext.Update(meal);
-                                        }
-                                    }                                
-                                }                                
+                                    MealId = item.MealId,
+                                    Quantity = item.Quantity,
+                                    Price = item.Quantity * item.Price,
+                                    DateGenerated = DateTime.Now,
+                                    Email = item.Email,
+                                    Customer = item.Customer,
+                                    Meal = item.Meal,
+                                    MealName = item.MealName
+                                };
+
+                                await dbContext.Invoices.AddAsync(newInv);
                             }
                         }
 
                         dbContext.RemoveRange(cartItems);
                         await dbContext.SaveChangesAsync();
 
-                        var orders = dbContext.Orders.Where(o => o.Email == email);
+                        var orders = dbContext.Orders.Where(o => o.Email == email && (o.IsReady == 'N' && o.IsCollected == 'N' || o.IsReady == 'Y' && o.IsCollected == 'N'));
 
-                        if(orders != null && orders.Any())
-                        {
+                        if (orders != null && orders.Any())
+                        {                            
                             return View(await orders.ToListAsync());
                         }
                         else
@@ -513,6 +552,51 @@ namespace DeliciousMeals.Controllers
             return RedirectToAction("Login", "Authentication");           
         }
         
+        public IActionResult DownloadOrderSlip()
+        {
+            if (HttpContext.Session.Get("email") != null)
+            {
+                ViewData["IsLogged"] = "yes";
+            }
+
+            return View();
+        }
+
+        public IActionResult DownloadInvoice()
+        {
+            if (HttpContext.Session.Get("email") != null)
+            {
+                ViewData["IsLogged"] = "yes";
+            }
+
+            return View();
+        }
+
+        public IActionResult GeneratePdf()
+        {
+            string htmlContent = "<html><body> <h1>Hello PDF! </h1> </body></html>";
+
+            var pdf = converter.Convert(new HtmlToPdfDocument()
+            {
+                GlobalSettings =
+                {
+                    ColorMode = ColorMode.Color,
+                    Orientation = Orientation.Portrait,
+                    PaperSize = PaperKind.A4
+                },
+
+                Objects =
+                {
+                    new ObjectSettings()
+                    {
+                        HtmlContent = htmlContent,
+                    }
+                }
+            });
+
+            return File(pdf, "application/pdf", "output.pdf");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

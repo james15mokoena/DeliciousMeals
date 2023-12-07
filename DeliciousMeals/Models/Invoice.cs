@@ -21,6 +21,9 @@ namespace DeliciousMeals.Models
         public int MealId { get; set; }
 
         [Required]
+        public required string MealName { get; set; }
+
+        [Required]
         public int Quantity { get; set; }
 
         [Required]

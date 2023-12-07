@@ -54,8 +54,8 @@
                             {
                                 <tr>
                                     <td><a asp-controller="Home" asp-action="DecreaseMealQuantity" asp-route-MealId="@cartItem.MealId" role="button" class="btn btn-warning" style="width:83px;height:39px;"><span style="font-size:22px;">-</span></a></td>
-                                    <td></td>@*@cartItem.Meal.Name*@
-                                    <td><img src="" width="100" height="90" alt="" /></td>@*~/@cartItem.Meal.Image , @cartItem.Meal.Name*@
+                                    <td>@cartItem.MealName</td>
+                                    <td><img src="~/@cartItem.MealImg" width="100" height="90" alt="@cartItem.MealName" /></td>
                                     <td>@cartItem.Quantity</td>
                                     <td>@cartItem.Price</td>
                                     <td><a asp-controller="Home" asp-action="IncreaseMealQuantity" asp-route-MealId="@cartItem.MealId" role="button" class="btn btn-success" style="width:83px;height:39px;"><span style="font-size:22px;">+</span></a></td>
