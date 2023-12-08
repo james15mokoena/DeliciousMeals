@@ -3,32 +3,46 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using DeliciousMeals.Data;
 using Microsoft.EntityFrameworkCore;
-using DinkToPdf.Contracts;
-using DinkToPdf;
 
 namespace DeliciousMeals.Controllers
 {
     public class HomeController : Controller
     {
         private readonly DeliciousMealsDbContext dbContext;
-        private readonly IConverter converter;
 
-        public HomeController(DeliciousMealsDbContext dbContext, IConverter converter)
+        public HomeController(DeliciousMealsDbContext dbContext)
         {
-            this.dbContext = dbContext;
-            this.converter = converter; 
+            this.dbContext = dbContext;            
+        }
+
+        private void CheckCustomerSession()
+        {
+            if (HttpContext.Session.GetString("email") != null)
+            {
+                ViewData["IsLogged"] = "yes";
+            }
+            else
+            {
+                ViewData["IsLogged"] = null;
+            }
+        }
+
+        public void CheckAdminSession()
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+            }
+            else
+            {
+                ViewData["AdminLogged"] = null;
+            }
         }
 
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.Get("email") != null)
-            {                
-                ViewData["IsLogged"] = "yes";
-            }
-            else
-            {                
-                ViewData["IsLogged"] = null;
-            }
+            CheckCustomerSession();
+            CheckAdminSession();
 
             var meals = dbContext.Meals.DefaultIfEmpty();
 
@@ -46,14 +60,8 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> DisplayMeal(int? MealId)
         {
-            if (HttpContext.Session.Get("email") != null)
-            {
-                ViewData["IsLogged"] = "yes";
-            }
-            else
-            {
-                ViewData["IsLogged"] = null;
-            }
+            CheckCustomerSession();
+            CheckAdminSession();
 
             var meal = await dbContext.Meals.FirstOrDefaultAsync(meal => meal.MealId == MealId);
 
@@ -65,30 +73,173 @@ namespace DeliciousMeals.Controllers
             return View();
         }
 
-        public IActionResult Reviews(int? MealId)
+        [HttpGet]
+        public async Task<IActionResult> Orders()
         {
+            if(HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                var orders = dbContext.Orders.DefaultIfEmpty();
+
+                if (orders != null && orders.Any())
+                {
+                    return View(await orders.ToListAsync());
+                }
+                else
+                {
+                    TempData["Response"] = "No pending orders";
+                    return RedirectToAction("Orders","Home");
+                }
+            }
+            else
+            {
+                ViewData["AdminLogged"] = null;
+            }
+
+            return RedirectToAction("AdminLogin","Authentication");
+        }
+
+        public IActionResult EditOrder()
+        {
+            if(HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                return View();
+            }
+
+            return RedirectToAction("AdminLogin","Authentication");
+        }
+
+        public async Task<IActionResult> EditOrderHelper(Order order)
+        {
+            var exOrder = await dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == order.OrderId);
+
+            if(exOrder != null)
+            {
+                exOrder.IsReady = order.IsReady;
+                exOrder.IsCollected = order.IsCollected;
+                exOrder.TimeCompleted = DateTime.Now;
+
+                if(exOrder.IsReady == 'Y' && exOrder.IsCollected == 'Y')
+                {
+                    dbContext.Orders.Remove(exOrder);
+                }
+                else
+                {
+                    dbContext.Orders.Update(exOrder);                    
+                }
+
+                await dbContext.SaveChangesAsync();
+                return RedirectToAction("Orders", "Home");
+            }
+            else
+            {
+                TempData["Response"] = "This order doesn't exist.";
+            }
+            return RedirectToAction("EditOrder", "Home");
+        }
+
+        public async Task<IActionResult> Reviews(int? mealId)
+        {
+            CheckCustomerSession();
+            CheckAdminSession();
+
+            var reviews = dbContext.Reviews.Where(m => m.MealId == mealId);
+            ViewData["MealId"] = mealId;
+            int? mId = mealId;            
+            if(mId != null)
+            {
+                int m = (int)mId;
+                HttpContext.Session.SetInt32("MealId", m);
+            }            
+
+            if (reviews != null && reviews.Any())
+            {                
+                return View(await reviews.ToListAsync());
+            }
+            else
+            {
+                TempData["Response"] = "This meal does not have reviews.";
+                return View();
+            }
+        }
+
+        public IActionResult AddReview(int? mealId)
+        {
+            CheckCustomerSession();            
+
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddReview(Review rev)
+        {
+            if(HttpContext.Session.GetString("email") != null)
+            {
+                ViewData["IsLogged"] = "yes";
+                string? nullableEmail = HttpContext.Session.GetString("email");
+
+                if(nullableEmail != null)
+                {                    
+                    string email = nullableEmail;
+                    var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Email == email);
+                    int? nullableMealId = HttpContext.Session.GetInt32("MealId");                    
+
+                    if (nullableMealId != null)
+                    {
+                        int mealId = (int) nullableMealId;
+                        
+                        var meal = await dbContext.Meals.FirstOrDefaultAsync(m => m.MealId == mealId);
+
+                        // check if the current user purchased the meal before allowing him/her to 
+                        // write a review of the meal.
+                        var invoice = await dbContext.Invoices.FirstOrDefaultAsync(i => i.MealId == mealId && i.Email == email);
+                        var exRev = await dbContext.Reviews.FirstOrDefaultAsync(r => r.MealId == mealId && r.Email == email);
+
+                        // Already review the meal.
+                        if(invoice != null && exRev == null)
+                        {
+                            if (rev != null && customer != null && meal != null)
+                            {
+                                rev.MealId = mealId;
+                                rev.Customer = customer;
+                                rev.Meal = meal;
+                                rev.Email = email;
+                                await dbContext.AddAsync(rev);
+                                await dbContext.SaveChangesAsync();
+                                return RedirectToAction("Index", "Home");
+                            }
+                        }
+                        else if(invoice != null && exRev != null)
+                        {
+                            TempData["Response"] = "Cannot review this meal again, because you already reviewed this meal.";
+                        }
+                        else
+                        {
+                            TempData["Response"] = "You cannot review a meal that you haven't purchased/ordered before on this website.";                                
+                        }
+
+                        return RedirectToAction("AddReview", "Home");                        
+                    }                                                                                
+                }                
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Please login, before reviewing a meal.";
+            }
+            return RedirectToAction("Login", "Authentication");
         }
 
         public async Task<IActionResult> DeleteMealFromCart(int? mealId)
         {
 
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("email") != null)
             {
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                byte[]? emailBytes = HttpContext.Session.Get("email");
-
-                if (emailBytes != null)
+                if (nullableEmail != null)
                 {
-                    char[] emailArray = new char[emailBytes.Length];
-
-                    for (int i = 0; i < emailArray.Length; ++i)
-                    {
-                        emailArray[i] = (char)emailBytes[i];
-                    }
-
-                    string email = new(emailArray);
-
+                    string email = nullableEmail;
                     var cartMeal = await dbContext.Carts.FirstOrDefaultAsync(m => m.MealId == mealId && m.Email == email);
                     var meal = await dbContext.Meals.FirstOrDefaultAsync(m=> m.MealId == mealId);
 
@@ -115,20 +266,13 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> DecreaseMealQuantity(int? mealId)
         {
-            if(HttpContext.Session.Get("email") != null)
+            if(HttpContext.Session.GetString("email") != null)
             {
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if(emailBytes != null)
+                if (nullableEmail != null)
                 {
-                    char[] emailChars = new char[emailBytes.Length];
-
-                    for(int i=0; i<emailBytes.Length; ++i)
-                    {
-                        emailChars[i] = (char) emailBytes[i];
-                    }
-
-                    string email = new(emailChars);
+                    string email = nullableEmail;
 
                     var cartItem = await dbContext.Carts.FirstOrDefaultAsync(item => item.MealId == mealId && item.Email == email);
                     var meal = await dbContext.Meals.FirstOrDefaultAsync(m => m.MealId == mealId);
@@ -167,21 +311,13 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> IncreaseMealQuantity(int? mealId)
         {
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("email") != null)
             {
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if (emailBytes != null)
-                {
-                    char[] emailChars = new char[emailBytes.Length];
-
-                    for (int i = 0; i < emailBytes.Length; ++i)
-                    {
-                        emailChars[i] = (char)emailBytes[i];
-                    }
-
-                    string email = new(emailChars);
-
+                if (nullableEmail != null)
+                {                    
+                    string email = nullableEmail;
                     var cartItem = await dbContext.Carts.FirstOrDefaultAsync(item => item.MealId == mealId && item.Email == email);
                     var meal = await dbContext.Meals.FirstOrDefaultAsync(m => m.MealId == mealId);
 
@@ -219,22 +355,15 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> AddToCart(int? mealId)
         {
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
-                
-                byte[]? emailBytes = HttpContext.Session.Get("email");   
 
-                if(emailBytes != null)
-                {
-                    char[] emailArray = new char[emailBytes.Length];
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                    for(int i=0; i<emailArray.Length; ++i)
-                    {
-                        emailArray[i] = (char)emailBytes[i];
-                    }
-
-                    string email = new (emailArray);
+                if (nullableEmail != null)
+                {                    
+                    string email = nullableEmail;
                     var meal = await dbContext.Meals.FirstOrDefaultAsync(meal => meal.MealId == mealId);
                     var cartItem = await dbContext.Carts.FirstOrDefaultAsync(cItem => cItem.MealId == mealId && cItem.Email == email);
                     var customer = await dbContext.Customers.FirstOrDefaultAsync(cust => cust.Email == email);                    
@@ -285,14 +414,7 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> DisplayByCategory(string? Category)
         {
-            if (HttpContext.Session.Get("email") != null)
-            {
-                ViewData["IsLogged"] = "yes";
-            }
-            else
-            {
-                ViewData["IsLogged"] = null;
-            }
+            CheckCustomerSession();            
 
             var meals = dbContext.Meals.Where(meal => meal.Category == Category);
 
@@ -309,14 +431,7 @@ namespace DeliciousMeals.Controllers
              
         public IActionResult DisplayMenu()
         {
-            if (HttpContext.Session.Get("email") != null)
-            {             
-                ViewData["IsLogged"] = "yes";
-            }
-            else
-            {             
-                ViewData["IsLogged"] = null;
-            }
+            CheckCustomerSession();            
 
             return View();
         }
@@ -324,21 +439,14 @@ namespace DeliciousMeals.Controllers
         public async Task<IActionResult> DisplayCart()
         {            
 
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if(emailBytes != null)
-                {
-                    char[] emailArray = new char[emailBytes.Length];
-
-                    for(int i=0; i<emailArray.Length; i++)
-                    {
-                        emailArray[i] = (char) emailBytes[i];
-                    }
-
-                    string email = new(emailArray);
+                if (nullableEmail != null)
+                {                    
+                    string email = nullableEmail;
                     var cart = dbContext.Carts.Where(cartItem => cartItem.Email == email);
 
                     if (cart != null)
@@ -373,21 +481,14 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> DisplayInvoice()
         {
-            if(HttpContext.Session.Get("email") != null)
+            if(HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if(emailBytes != null)
+                if (nullableEmail != null)
                 {
-                    char[] emailChars = new char[emailBytes.Length];
-
-                    for(int i=0; i<emailBytes.Length; i++)
-                    {
-                        emailChars[i] = (char)emailBytes[i];
-                    }
-
-                    string email = new(emailChars);
+                    string email = nullableEmail;                    
                     var invoices = dbContext.Invoices.Where(inv => inv.Email == email);
 
                     if (invoices != null)
@@ -417,10 +518,9 @@ namespace DeliciousMeals.Controllers
        
         public IActionResult Checkout()
         {
-            if(HttpContext.Session.Get("email") != null)
+            if(HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
-
                 return View();
             }
 
@@ -430,24 +530,17 @@ namespace DeliciousMeals.Controllers
 
         public async Task<IActionResult> TempOrder()
         {
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
 
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if (emailBytes != null)
+                if (nullableEmail != null)
                 {
-                    char[] emailChars = new char[emailBytes.Length];
+                    string email = nullableEmail;
 
-                    for (int i = 0; i < emailBytes.Length; i++)
-                    {
-                        emailChars[i] = (char)emailBytes[i];
-                    }
-
-                    string email = new(emailChars);
-
-                    var orders = dbContext.Orders.Where(order => order.Email == email);
+                    var orders = dbContext.Orders.Where(order => order.Email == email && (order.IsCollected == 'N' && (order.IsReady == 'Y' || order.IsReady == 'N')));
 
                     if(orders != null && orders.Any())
                     {
@@ -467,23 +560,15 @@ namespace DeliciousMeals.Controllers
        
         public async Task<IActionResult> Order()
         {
-            if(HttpContext.Session.Get("email") != null)
+            if(HttpContext.Session.GetString("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
 
-                byte[]? emailBytes = HttpContext.Session.Get("email");
+                string? nullableEmail = HttpContext.Session.GetString("email");
 
-                if(emailBytes != null)
+                if (nullableEmail != null)
                 {
-                    char[] emailChars = new char[emailBytes.Length];
-
-                    for(int i=0; i<emailBytes.Length; i++)
-                    {
-                        emailChars[i] = (char) emailBytes[i];
-                    }
-
-                    string email = new(emailChars);
-
+                    string email = nullableEmail;
                     var cartItems = dbContext.Carts.Where(ct => ct.Email == email);                    
                     var customer = await dbContext.Customers.FirstOrDefaultAsync(cust => cust.Email == email);                    
 
@@ -551,15 +636,18 @@ namespace DeliciousMeals.Controllers
             TempData["ErrorMessage"] = "Please login before accessing your orders.";
             return RedirectToAction("Login", "Authentication");           
         }
-        
+
+        /*
         public IActionResult DownloadOrderSlip()
         {
             if (HttpContext.Session.Get("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
+                Converter.Convert(new Uri("https://localhost:44377/Home/TempOrder"), @"C:\Users\Pheello Mokoena\Downloads\Order.pdf");
+                return RedirectToAction("TempOrder", "Home");
             }
 
-            return View();
+            return RedirectToAction("Login", "Authentication");
         }
 
         public IActionResult DownloadInvoice()
@@ -567,35 +655,13 @@ namespace DeliciousMeals.Controllers
             if (HttpContext.Session.Get("email") != null)
             {
                 ViewData["IsLogged"] = "yes";
+                Converter.Convert(new Uri("https://localhost:44377/Home/DisplayInvoice"), @"C:\Users\Pheello Mokoena\Downloads\Invoice.pdf");
+                return RedirectToAction("DisplayInvoice", "Home");
             }
 
-            return View();
+            return RedirectToAction("DisplayInvoice", "Home");
         }
-
-        public IActionResult GeneratePdf()
-        {
-            string htmlContent = "<html><body> <h1>Hello PDF! </h1> </body></html>";
-
-            var pdf = converter.Convert(new HtmlToPdfDocument()
-            {
-                GlobalSettings =
-                {
-                    ColorMode = ColorMode.Color,
-                    Orientation = Orientation.Portrait,
-                    PaperSize = PaperKind.A4
-                },
-
-                Objects =
-                {
-                    new ObjectSettings()
-                    {
-                        HtmlContent = htmlContent,
-                    }
-                }
-            });
-
-            return File(pdf, "application/pdf", "output.pdf");
-        }
+        */
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -6,6 +6,7 @@ namespace DeliciousMeals.Models
     [Table("Review")]
     public class Review
     {
+        [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RevId { get; set; }
@@ -17,9 +18,13 @@ namespace DeliciousMeals.Models
         public required string Email { get; set; }
 
         [Required]
+        public required string ReviewerName { get; set; }
+
+        [Required]
         public int Rating { get; set; }
 
         [Required]
+        [Column(TypeName = "text")]
         public required string Comment { get; set; }
 
         [Required]

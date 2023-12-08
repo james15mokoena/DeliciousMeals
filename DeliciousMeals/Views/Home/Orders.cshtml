@@ -1,0 +1,65 @@
+﻿@model IList<DeliciousMeals.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container">
+
+            <h1 class="display-5 text-center"> Pending Orders.</h1>
+
+            <div class="container text-center mt-5">
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Order Id</th>
+                            <th>Meal Id</th>
+                            <th>Date Ordered</th>
+                            <th>Is Ready?</th>
+                            <th>Is Collected?</th>
+                            <th>Time Completed</th>
+                            <th>Ordered By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            foreach (Order order in Model)
+                            {
+                                if (order != null)
+                                {
+                                    <tr>
+                                        <td>@order.OrderId</td>
+                                        <td>@order.MealId</td>
+                                        <td>@order.DateOrdered</td>
+                                        <td>@order.IsReady</td>
+                                        <td>@order.IsCollected</td>
+                                        <td>@order.TimeCompleted</td>
+                                        <td>@order.Email</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="container text-center">
+                <a role="button" class="btn btn-primary mt-4" asp-action="EditOrder" asp-controller="Home">Edit Order</a>
+            </div>
+
+        </div>
+    }
+}
+

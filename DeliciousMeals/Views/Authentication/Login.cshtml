@@ -7,7 +7,7 @@
 
     <h1 class="display-6"> Login </h1>
 
-    <form class="form mt-5" method="get" asp-action="LoginVerification">
+    <form class="form mt-5" method="get" asp-action="CustomerLoginVerification">
 
         <label for="Email" class="form-label">Email:</label>        
         <input asp-for="Email" class="form-control" type="text" id="Email" required />
@@ -22,7 +22,7 @@
     <br/>
 
     @{
-        if(TempData.ContainsKey("ErrorMessage"))
+        if(TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger">
                 @TempData["ErrorMessage"]

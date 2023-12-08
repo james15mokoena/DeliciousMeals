@@ -13,6 +13,9 @@
 
             box-shadow: 5px 0 10px rgba(0,0,0,0.5);
         }
+        .anchors{
+            text-decoration: none;
+        }
 
     </style>
 </head>
@@ -73,9 +76,9 @@
                                     <li class="nav-item">
                                         <a class="anchors nav-link text-white" asp-controller="Home" asp-action="DisplayInvoice">Invoice</a>
                                     </li>
-                                }
+                                 }
                             }                            
-                        }
+                        } 
                         @{
                             if (ViewData["IsLogged"] != null)
                             {
@@ -83,7 +86,19 @@
                                 if (logged != null && logged == "yes")
                                 {
                                     <li class="nav-item">
-                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="TempOrder">Orders</a>
+                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="TempOrder">Your Orders</a>
+                                    </li>
+                                }
+                            }
+                        }
+                        @{
+                            if (ViewData["AdminLogged"] != null)
+                            {
+                                string? logged = (string?)ViewData["AdminLogged"];
+                                if (logged != null && logged == "yes")
+                                {
+                                    <li class="nav-item">
+                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="Orders">Orders</a>
                                     </li>
                                 }
                             }
@@ -94,10 +109,11 @@
                 <div class="navbar-collapse collapse justify-content-end">                                            
                                              
                     @{
-                       if(ViewData["IsLogged"] != null)
+                        if (ViewData["IsLogged"] != null || ViewData["AdminLogged"] != null)
                         {
                             string? logged = (string?) ViewData["IsLogged"];
-                            if(logged != null && logged == "yes")
+                            string? adminLogged = (string?) ViewData["AdminLogged"];
+                            if ((logged != null && logged == "yes") || (adminLogged != null && adminLogged == "yes"))
                             {
                                 <a class="anchors nav-link text-white ml-5" asp-controller="Authentication" asp-action="Logout">Logout</a>
                             }
@@ -118,8 +134,13 @@
     </div>
 
     <footer class="border-top footer bg-danger text-white">
-        <div class="container">
-            &copy; 2023 - DeliciousMeals
+        <div class="container d-inline-flex">
+            <div class="container justify-content-start">
+                &copy; 2023 - DeliciousMeals
+            </div>
+            <div class="container justify-content-end">
+                <a class="anchors text-white" asp-action="AdminLogin" asp-controller="Authentication">Admin Login</a>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

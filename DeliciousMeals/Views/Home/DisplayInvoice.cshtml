@@ -13,11 +13,11 @@
     else
     {
         <div class="container">
-            
+                    
             <h1 class="display-5 text-center"> Invoice </h1>
-            
+                    
             <table class="table mt-5">
-                
+                        
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -28,28 +28,25 @@
                 </thead>
                 <tbody>
                     @{
-                        if(Model != null)
+                if(Model != null)
+                {
+                    foreach(Invoice inv in Model)
+                    {
+                        if(inv != null)
                         {
-                            foreach(Invoice inv in Model)
-                            {
-                                if(inv != null)
-                                {
-                                    <tr>
-                                        <td>@inv.MealName</td>
-                                        <td>@inv.Quantity</td>
-                                        <td>@inv.Price</td>
-                                        <td>@inv.DateGenerated</td>
-                                    </tr>
-                                }
-                            }
-                        }                        
+                            <tr>
+                                <td>@inv.MealName</td>
+                                <td>@inv.Quantity</td>
+                                <td>@inv.Price</td>
+                                <td>@inv.DateGenerated</td>
+                            </tr>
+                        }
+                    }
+                }                        
                     }
                 </tbody>
 
-            </table>
-            <div class="container text-center mt-5">
-                <a role="button" class="btn btn-warning" asp-controller="Home" asp-action="DownloadInvoice">Download Invoice</a>
-            </div>            
+            </table>                  
         </div>        
     }
 }

@@ -20,5 +20,6 @@ namespace DeliciousMeals.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Cart> Carts { get; set; }        
+        public DbSet<Review> Reviews { get; set; }
     }
 }

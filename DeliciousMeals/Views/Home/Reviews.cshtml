@@ -1,5 +1,70 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IList<DeliciousMeals.Models.Review>;
+
 @{
+    ViewData["Title"] = "Reviews";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {        
+
+        <div class="container">
+
+            <h1 class="display-5 text-center"> Meal Reviews</h1>
+
+            <div class="row row-cols-1 mt-4">
+
+                @{                    
+                    foreach(Review rev in Model)
+                    {
+                        if(rev != null)
+                        {                            
+                            <div class="col col-sm-12 mt-3" style="background-color:lightgray;">
+                                <p><span style="font-weight:bold;">Reviewer:</span> @rev.ReviewerName</p>
+                                <p><span style="font-weight:bold;">Rating:</span> @rev.Rating/5</p>
+                                <p style="font-weight:bold;">Comment:</p>
+                                <textarea rows="5" cols="100" readonly>@rev.Comment</textarea>
+                            </div>
+                        }
+                    }
+                }
+
+            </div>            
+        </div>
+    }
+
+    <div class="container text-center mt-4">
+
+        <a role="button" class="btn btn-outline-success" asp-route-MealId="@{
+
+               if(ViewData["MealId"] != null){
+
+                   object? obj = ViewData["MealId"];
+
+                   if(obj != null){
+
+                       string? mId = obj.ToString();
+
+                       if(mId != null){
+
+                            int? mealId = int.Parse(mId);
+
+                            if(mealId != null){
+                                @mealId
+                            }
+                            else{
+                                int x = -1;
+                                @x
+                            }
+                       }                       
+                   }                 
+               }
+            }"
+            asp-action="AddReview" asp-controller="Home">Add Review</a>
+    </div>
 }
+

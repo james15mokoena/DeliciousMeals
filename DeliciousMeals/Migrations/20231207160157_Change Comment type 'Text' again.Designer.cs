@@ -4,6 +4,7 @@ using DeliciousMeals.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeliciousMeals.Migrations
 {
     [DbContext(typeof(DeliciousMealsDbContext))]
-    partial class DeliciousMealsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231207160157_Change Comment type 'Text' again")]
+    partial class ChangeCommenttypeTextagain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("Administrator", (string)null);
+                    b.ToTable("Administrator");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Cart", b =>
@@ -83,7 +86,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("Cart", (string)null);
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Customer", b =>
@@ -109,7 +112,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("Customer", (string)null);
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Invoice", b =>
@@ -146,7 +149,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("Invoice", (string)null);
+                    b.ToTable("Invoice");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Meal", b =>
@@ -189,7 +192,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasKey("MealId");
 
-                    b.ToTable("Meal", (string)null);
+                    b.ToTable("Meal");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Order", b =>
@@ -231,7 +234,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("Order", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Review", b =>
@@ -266,7 +269,7 @@ namespace DeliciousMeals.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("Review", (string)null);
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("DeliciousMeals.Models.Cart", b =>

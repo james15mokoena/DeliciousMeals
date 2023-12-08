@@ -1,0 +1,31 @@
+﻿@model DeliciousMeals.Models.Order;
+
+@{
+    ViewData["Title"] = "Edit order";
+}
+
+<div class="container text-center">
+
+    <h1 class="display-5"> Edit Order</h1>
+
+    <form class="form mt-4" asp-action="EditOrderHelper" asp-controller="Home">
+
+        <label for="OrderId" class="form-label">Order Id</label>
+        <input id="OrderId" class="form-control" asp-for="OrderId" type="number" required/>
+        <label for="IsReady" class="form-label">Is Ready?</label>
+        <input id="IsReady" class="form-control" asp-for="IsReady" type="text" required />
+        <label for="IsCollected" class="form-label">Is Collected?</label>
+        <input id="IsCollected" class="form-control" asp-for="IsCollected" type="text" required />        
+        <button class="btn btn-outline-success mt-4" type="submit">Edit Order</button>
+    </form>
+
+</div>
+
+@{
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+}

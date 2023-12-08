@@ -1,0 +1,30 @@
+﻿@model DeliciousMeals.Models.Review;
+@{
+    ViewData["Title"] = "Add Review";
+
+    if(TempData["Response"] != null)
+    {
+        <div class="alert alert-warning"> 
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container text-center">
+
+            <h1 class="display-5"> Review Meal</h1>
+
+            <form class="form mt-4" method="post" asp-action="AddReview" asp-controller="Home">
+
+                <label for="ReviewerName" class="form-label">Your name: </label>
+                <input type="text" class="form-control" id="ReviewerName" asp-for="ReviewerName" required />
+                <label for="Rating" class="form-label">Rating: </label>
+                <input type="number" min="0" max="5" class="form-control" id="Rating" asp-for="Rating" required />
+                <label for="Comment" class="form-label">Comment:</label>
+                <textarea class="form-control" cols="15" required asp-for="Comment"></textarea>
+                <button class="btn btn-outline-primary mt-4" type="submit">Add Review</button>
+            </form>
+
+        </div>
+    }
+}
