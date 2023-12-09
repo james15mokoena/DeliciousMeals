@@ -1,0 +1,44 @@
+﻿@model DeliciousMeals.Models.Meal;
+
+@{
+    ViewData["Title"] = "Edit Meal";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container text-center">
+
+        <h1 class="display-5 mb-3">Edit Meal</h1>
+
+            <form class="form" method="post" asp-action="EditMeal" asp-controller="Home">
+
+                <label for="MealId" class="form-label">Meal Id:</label>
+                <input type="number" class="form-control" id="MealId" asp-for="MealId" required/>
+                <label for="Name" class="form-label mt-3">Name:</label>
+                <input type="text" class="form-control" id="Name" asp-for="Name" />
+                <label for="Description" class="form-label mt-3">Description</label>
+                <textarea id="Description" asp-for="Description" class="form-control" cols="15" rows="3"></textarea>
+                <label for="Price" class="form-label mt-3">Price:</label>
+                <input type="number" id="Price" asp-for="Price" class="form-control" placeholder="R" required />
+                <label for="Quantity" class="form-label mt-3">Quantity:</label>
+                <input type="number" id="Quantity" asp-for="Quantity" class="form-control" required />
+                <label for="Image" class="form-label mt-3">Image Url:</label>
+                <input type="text" class="form-control" id="Image" asp-for="Image" />
+                <label for="IsAvailable" class="form-label mt-3">Is Available?</label>
+                <input type="text" class="form-control" id="IsAvailable" asp-for="IsAvailable" placeholder="type Y or N" required />
+                <label for="Category" class="form-label mt-3">Category:</label>
+                <input type="text" class="form-control" id="Category" asp-for="Category"/>
+                <label for="Size" class="form-label mt-3">Size:</label>
+                <input type="text" class="form-control" id="Size" asp-for="Size"/>
+                <button class="btn btn-primary mt-3 " type="submit">Edit Meal</button>
+
+            </form>
+
+        </div>
+    }
+}

@@ -1,0 +1,69 @@
+﻿@model IList<DeliciousMeals.Models.Meal>
+
+@{
+    ViewData["Title"] = "All Meals";
+
+    if(TempData["Response"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container">
+        
+            <table class="table">
+                
+                <thead>
+                    <tr>
+                        <th>Meal Id</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price (ZAR)</th>
+                        <th>Quantity</th>
+                        <th>Image</th>
+                        <th>Is Available?</th>
+                        <th>Category</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    
+                    @{
+                        if(Model != null)
+                        {
+                            foreach(Meal meal in Model)
+                            {
+                                if(meal != null)
+                                {
+                                    <tr>
+                                        <td>@meal.MealId</td>
+                                        <td>@meal.Name</td>
+                                        <td>@meal.Description</td>
+                                        <td>@meal.Price</td>
+                                        <td>@meal.Quantity</td>
+                                        <td>@meal.Image</td>
+                                        <td>@meal.IsAvailable</td>
+                                        <td>@meal.Category</td>
+                                        <td>@meal.Size</td>
+
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+            <div class="container text-center mt-4">
+                <a class="btn btn-success" role="button" asp-action="AddMeal" asp-controller="Home">Add Meal</a>
+                <a class="btn btn-primary" role="button" asp-action="EditMeal" asp-controller="Home">Edit Meal</a>
+                <a class="btn btn-danger" role="button" asp-action="DeleteMeal" asp-controller="Home">Delete Meal</a>
+            </div>
+        </div>
+    }
+}
+

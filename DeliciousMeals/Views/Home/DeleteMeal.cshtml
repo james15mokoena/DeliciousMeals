@@ -1,0 +1,28 @@
+﻿@model DeliciousMeals.Models.Meal;
+
+@{
+    ViewData["Title"] = "Delete Meal";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container text-center">
+
+            <h1 class="display-5 mb-3">Delete Meal</h1>
+
+            <form class="form" method="post" asp-action="DeleteMeal" asp-controller="Home">
+
+                <label for="MealId" class="form-label">Meal Id:</label>
+                <input asp-for="MealId" type="number" class="form-control" id="MealId" required />                
+                <button type="submit" class="btn btn-danger mt-4">Delete Meal</button>
+
+            </form>
+
+        </div>
+    }
+}

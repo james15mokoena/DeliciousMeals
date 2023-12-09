@@ -103,6 +103,18 @@
                                 }
                             }
                         }
+                        @{
+                            if (ViewData["AdminLogged"] != null)
+                            {
+                                string? logged = (string?)ViewData["AdminLogged"];
+                                if (logged != null && logged == "yes")
+                                {
+                                    <li class="nav-item">
+                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="ViewMeals">View Meals</a>
+                                    </li>
+                                }
+                            }
+                        }
                     </ul>                   
                 </div>
              

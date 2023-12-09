@@ -1,0 +1,42 @@
+﻿@model DeliciousMeals.Models.Meal;
+
+@{
+    ViewData["Title"] = "Add Meal";
+
+    if(TempData["Response"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container text-center">
+
+            <h1 class="display-5 mb-3">Add Meal</h1>
+
+            <form class="form" method="post" asp-action="AddMeal" asp-controller="Home">
+                                
+                <label for="Name" class="form-label">Name:</label>
+                <input type="text" class="form-control" id="Name" asp-for="Name" required/>
+                <label for="Description" class="form-label mt-3">Description</label>
+                <textarea id="Description" asp-for="Description" class="form-control" cols="15" rows="3" required></textarea>
+                <label for="Price" class="form-label mt-3">Price:</label>
+                <input type="number" id="Price" asp-for="Price" required class="form-control" placeholder="R"/>
+                <label for="Quantity" class="form-label mt-3">Quantity:</label>
+                <input type="number" id="Quantity" asp-for="Quantity" required class="form-control" />
+                <label for="Image" class="form-label mt-3">Image Url:</label>
+                <input type="text" class="form-control" id="Image" asp-for="Image" required/>
+                <label for="IsAvailable" class="form-label mt-3">Is Available?</label>
+                <input type="text" class="form-control" id="IsAvailable" asp-for="IsAvailable" placeholder="type Y or N" required/>
+                <label for="Category" class="form-label mt-3">Category:</label>
+                <input type="text" class="form-control" id="Category" asp-for="Category" required/>
+                <label for="Size" class="form-label mt-3">Size:</label>
+                <input type="text" class="form-control" id="Size" asp-for="Size" required/>
+                <button class="btn btn-success mt-4" type="submit">Add Meal</button>
+
+            </form>
+
+        </div>
+    }
+}

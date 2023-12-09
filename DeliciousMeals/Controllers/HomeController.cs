@@ -23,7 +23,7 @@ namespace DeliciousMeals.Controllers
             }
             else
             {
-                ViewData["IsLogged"] = null;
+                ViewData["IsLogged"] = null;                
             }
         }
 
@@ -44,7 +44,7 @@ namespace DeliciousMeals.Controllers
             CheckCustomerSession();
             CheckAdminSession();
 
-            var meals = dbContext.Meals.DefaultIfEmpty();
+            var meals = dbContext.Meals.Where(m => m.IsAvailable == 'Y');
 
             if(meals != null)
             {
@@ -637,31 +637,156 @@ namespace DeliciousMeals.Controllers
             return RedirectToAction("Login", "Authentication");           
         }
 
-        /*
-        public IActionResult DownloadOrderSlip()
+        [HttpGet]
+        public async Task<IActionResult> ViewMeals()
         {
-            if (HttpContext.Session.Get("email") != null)
+            if(HttpContext.Session.GetString("adminEmail") != null)
             {
-                ViewData["IsLogged"] = "yes";
-                Converter.Convert(new Uri("https://localhost:44377/Home/TempOrder"), @"C:\Users\Pheello Mokoena\Downloads\Order.pdf");
-                return RedirectToAction("TempOrder", "Home");
-            }
+                ViewData["AdminLogged"] = "yes";
+                var meals = dbContext.Meals.DefaultIfEmpty();
 
-            return RedirectToAction("Login", "Authentication");
+                if (meals != null)
+                {
+                    return View(await meals.ToListAsync());
+                }
+                else
+                {
+                    TempData["Response"] = "No meals are currently available in the database.";
+                    return View();
+                }
+            }            
+
+            return RedirectToAction("AdminLogin","Authentication");
         }
 
-        public IActionResult DownloadInvoice()
+        [HttpGet]
+        public IActionResult AddMeal()
         {
-            if (HttpContext.Session.Get("email") != null)
+            if (HttpContext.Session.GetString("adminEmail") != null)
             {
-                ViewData["IsLogged"] = "yes";
-                Converter.Convert(new Uri("https://localhost:44377/Home/DisplayInvoice"), @"C:\Users\Pheello Mokoena\Downloads\Invoice.pdf");
-                return RedirectToAction("DisplayInvoice", "Home");
+                ViewData["AdminLogged"] = "yes";
+                return View();
             }
 
-            return RedirectToAction("DisplayInvoice", "Home");
+            return RedirectToAction("AdminLogin","Authentication");
         }
-        */
+
+        public async Task<IActionResult> AddMeal(Meal meal)
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                var exMeal = await dbContext.Meals.FirstOrDefaultAsync(m=> m.MealId == meal.MealId);
+
+                if (exMeal == null)
+                {
+                    await dbContext.Meals.AddAsync(meal);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("ViewMeals", "Home");
+                }
+                else
+                {
+                    TempData["Response"] = "This meal already exists.";
+                    return View();
+                }
+            }
+
+            return RedirectToAction("AdminLogin","Authentication");
+        }
+
+        [HttpGet]
+        public IActionResult EditMeal()
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                return View();
+            }
+
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
+
+        public async Task<IActionResult> EditMeal(Meal meal)
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                var exMeal = await dbContext.Meals.FirstOrDefaultAsync(m => m.MealId == meal.MealId);
+
+                if (exMeal != null)
+                {
+                    if (meal.Name != null && !meal.Name.Equals(""))
+                        exMeal.Name = meal.Name;
+
+                    if(meal.Description != null && !meal.Description.Equals(""))
+                        exMeal.Description = meal.Description;
+
+                    if (meal.Price >= 0)                                           
+                        exMeal.Price = meal.Price;
+
+                    if (meal.Quantity >= 0)
+                        exMeal.Quantity = meal.Quantity;
+
+                    if (meal.Image != null && !meal.Image.Equals(""))
+                        exMeal.Image = meal.Image;
+
+                    if (!meal.IsAvailable.Equals(""))
+                        exMeal.IsAvailable = meal.IsAvailable;
+
+                    if (meal.Category != null && !meal.Category.Equals(""))
+                        exMeal.Category = meal.Category;
+
+                    if (meal.Size != null && !meal.Size.Equals(""))
+                        exMeal.Size = meal.Size;
+
+                    dbContext.Meals.Update(exMeal);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("ViewMeals", "Home");
+                }
+                else
+                {
+                    TempData["Response"] = "Cannot edit a non-existing meal.";
+                    return View();
+                }
+            }
+
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
+
+        [HttpGet]
+        public IActionResult DeleteMeal()
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                return View();
+            }
+
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
+
+        public async Task<IActionResult> DeleteMeal(int mealId)
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                var meal = await dbContext.Meals.FirstOrDefaultAsync(m=> m.MealId == mealId);
+
+                if (meal != null)
+                {
+                    dbContext.Meals.Remove(meal);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("ViewMeals","Home");
+                }
+                else
+                {
+                    TempData["Response"] = "Cannot delete a non-existing meal.";
+                    return View();
+                }
+            }
+
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
