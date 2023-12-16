@@ -38,6 +38,9 @@ namespace DeliciousMeals.Models
         [DataType(DataType.Time)]
         public DateTime? TimeCompleted { get; set; }
 
+        [Required]
+        public int Quantity { get; set; }
+
         // Reference/Navigation property
         [Required]
         [ForeignKey("Email")]

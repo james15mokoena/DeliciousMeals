@@ -22,7 +22,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Quantity</th>
-                        <th>Price</th>
+                        <th>Price (ZAR)</th>
                         <th>Date Generated</th>
                     </tr>
                 </thead>
@@ -47,6 +47,10 @@
                 </tbody>
 
             </table>                  
+
+            <div class="container text-center mt-4">
+            <a class="btn btn-danger" role="button" asp-action="DeleteInvoice" asp-controller="Home">Delete Invoice</a>
+            </div>
         </div>        
     }
 }

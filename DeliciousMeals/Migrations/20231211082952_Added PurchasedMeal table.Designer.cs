@@ -4,6 +4,7 @@ using DeliciousMeals.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeliciousMeals.Migrations
 {
     [DbContext(typeof(DeliciousMealsDbContext))]
-    partial class DeliciousMealsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231211082952_Added PurchasedMeal table")]
+    partial class AddedPurchasedMealtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,43 +240,6 @@ namespace DeliciousMeals.Migrations
                     b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("DeliciousMeals.Models.PurchasedMeal", b =>
-                {
-                    b.Property<int>("PurchaseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
-
-                    b.Property<DateTime>("DatePurchased")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MealId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MealName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("PurchaseId");
-
-                    b.HasIndex("Email");
-
-                    b.HasIndex("MealId");
-
-                    b.ToTable("PurchasedMeal");
-                });
-
             modelBuilder.Entity("DeliciousMeals.Models.Review", b =>
                 {
                     b.Property<int>("RevId")
@@ -357,25 +323,6 @@ namespace DeliciousMeals.Migrations
 
                     b.HasOne("DeliciousMeals.Models.Meal", "Meal")
                         .WithMany("Orders")
-                        .HasForeignKey("MealId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Meal");
-                });
-
-            modelBuilder.Entity("DeliciousMeals.Models.PurchasedMeal", b =>
-                {
-                    b.HasOne("DeliciousMeals.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("Email")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DeliciousMeals.Models.Meal", "Meal")
-                        .WithMany()
                         .HasForeignKey("MealId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

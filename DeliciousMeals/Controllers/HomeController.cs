@@ -588,7 +588,8 @@ namespace DeliciousMeals.Controllers
                                     Email = email,
                                     Customer = customer,
                                     Meal = item.Meal,
-                                    MealName = item.MealName                                   
+                                    MealName = item.MealName,
+                                    Quantity = item.Quantity,
                                 };
 
                                 dbContext.Orders.Add(newOrder);                                                               
@@ -611,6 +612,19 @@ namespace DeliciousMeals.Controllers
                                     MealName = item.MealName
                                 };
 
+                                PurchasedMeal pMeal = new()
+                                {
+                                    MealId = item.MealId,
+                                    MealName = item.MealName,
+                                    Quantity = item.Quantity,
+                                    Email = item.Email,
+                                    DatePurchased = DateTime.Now,
+                                    Meal = item.Meal,
+                                    TotalPrice = item.Price * item.Quantity,
+                                    Customer = item.Customer
+                                };
+
+                                await dbContext.PurchasedMeals.AddAsync(pMeal);
                                 await dbContext.Invoices.AddAsync(newInv);
                             }
                         }
@@ -785,6 +799,107 @@ namespace DeliciousMeals.Controllers
                 }
             }
 
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
+
+        public async Task<IActionResult> DeleteInvoice()
+        {
+            if (HttpContext.Session.GetString("email") != null)
+            {
+                ViewData["IsLogged"] = "yes";
+                string? nullableEmail = HttpContext.Session.GetString("email");
+
+                if(nullableEmail != null)
+                {                    
+                    var invoices = dbContext.Invoices.Where(i => i.Email == nullableEmail);
+
+                    if(invoices != null && invoices.Any())
+                    {
+                        dbContext.Invoices.RemoveRange(invoices);
+                        await dbContext.SaveChangesAsync();
+                        return RedirectToAction("DisplayInvoice","Home");
+                    }
+                    else
+                    {
+                        TempData["Response"] = "You don't have an invoice.";
+                        return View();
+                    }
+                }                
+            }
+
+            TempData["ErrorMessage"] = "Please login before accessing your invoice.";
+            return RedirectToAction("Login","Authentication");
+        }
+
+        public IActionResult SalesReport()
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                return View();
+            }
+
+            TempData["Response"] = "Please login before accessing the sales report.";
+            return RedirectToAction("AdminLogin","Authentication");
+        }
+
+        public async Task<IActionResult> DisplayPurchasedMeals()
+        {
+            if(HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                var purchasedMeals = dbContext.PurchasedMeals.DefaultIfEmpty();                
+
+                if(purchasedMeals != null && purchasedMeals.Any())
+                {                                       
+                    return View(await purchasedMeals.ToListAsync());
+                }
+                else
+                {
+                    TempData["Response"] = "No meals have been purchased yet.";
+                    return View();
+                }
+            }
+
+            TempData["Response"] = "Please login before accessing the meals report.";
+            return RedirectToAction("AdminLogin","Authentication");
+        }
+
+        public IActionResult DisplayGraphicReports()
+        {
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                ViewData["AdminLogged"] = "yes";
+                return View();
+            }
+
+            TempData["Response"] = "Please login before accessing the graphic reports.";
+            return RedirectToAction("AdminLogin", "Authentication");
+        }
+
+        public async Task<IActionResult> FilterPurchasedMeals(DateTime fromDate, DateTime toDate)
+        {          
+            if (HttpContext.Session.GetString("adminEmail") != null)
+            {
+                DateTime f = fromDate;
+                DateTime t = toDate;
+
+                ViewData["AdminLogged"] = "yes";
+
+                var purchasedMeals = dbContext.PurchasedMeals.Where(m => m.DatePurchased >= fromDate && m.DatePurchased <= toDate);
+
+                if(purchasedMeals != null && purchasedMeals.Any())
+                {
+                    return View(await purchasedMeals.ToListAsync());
+                }
+                else
+                {
+                    TempData["Response"] = "No meals were purchased within that period.";
+                    return RedirectToAction("DisplayPurchasedMeals","Home");
+                }                
+            }
+
+            TempData["Response"] = "Please login before accessing the graphic reports.";
             return RedirectToAction("AdminLogin", "Authentication");
         }
 

@@ -1,0 +1,159 @@
+﻿@model IList<DeliciousMeals.Models.PurchasedMeal>
+
+@{
+    ViewData["Title"] = "Purchased Meals";
+
+    if (TempData["Response"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["Response"]
+        </div>
+    }
+    else
+    {
+        <div class="container">
+
+            <h1 class="display-5 text-center">All Sold Meals</h1>
+
+
+            <table class="table mt-4 text-center" style="font-size:18px;background-color:burlywood">
+
+                <thead>
+
+                    <tr>
+                        <th>Meal Id</th>
+                        <th>Meal Name</th>
+                        <th>Quantity</th>
+                        <th>Date Purchased</th>
+                        <th>Purchased By</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int totalMealSold = 0;
+                        decimal totalRevenue = 0;
+                        string mostSold = "";
+                        string leastSold = "";
+                        Dictionary<string, int> flags = new();
+
+                        if (Model != null)
+                        {
+                            foreach (PurchasedMeal meal in Model)
+                            {
+                                if (meal != null)
+                                {
+                                    totalMealSold += meal.Quantity;
+                                    totalRevenue += meal.TotalPrice;
+
+                                    if (flags.ContainsKey(meal.MealName))
+                                    {
+                                        int quantity = meal.Quantity;
+                                        int dictQuantity = flags.GetValueOrDefault(meal.MealName);
+                                        flags.Remove(meal.MealName);
+                                        flags.Add(meal.MealName, meal.Quantity + dictQuantity);
+                                    }
+                                    else
+                                    {
+                                        flags.Add(meal.MealName, meal.Quantity);
+                                    }
+
+                                    <tr>
+                                        <td>@meal.MealId</td>
+                                        <td>@meal.MealName</td>
+                                        <td>@meal.Quantity</td>
+                                        <td>@meal.DatePurchased</td>
+                                        <td>@meal.Email</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+            <h1 class="display-5 mt-3 text-center">Summary</h1>
+
+            @{
+
+                // An algorithm for finding a meal with most sales.
+                int quantityCounter = -1;
+
+                foreach (string key in flags.Keys)
+                {
+                    if (key != null)
+                    {
+
+                        int value = flags.GetValueOrDefault(key);
+                        if (value > quantityCounter)
+                        {
+                            mostSold = key;
+                            quantityCounter = value;
+                        }
+                    }
+                }
+
+                // An algorithm for finding a meal with least sales.
+                int leastCounter = -1;
+
+                foreach (string key in flags.Keys)
+                {
+                    if (key != null)
+                    {
+
+                        int value = flags.GetValueOrDefault(key);
+
+                        // Will execute once.
+                        if (leastCounter == -1)
+                            leastCounter = value;
+
+                        if (value <= leastCounter)
+                        {
+                            leastSold = key;
+                            leastCounter = value;
+                        }
+                    }
+                }
+
+                <div class="container align mt-4" style="background-color:burlywood;">
+                    <ul>
+                        <li style="font-size:20px;text-align:start;">
+                            Total number of meals sold:
+                            <span style="font-size:20px;text-decoration:underline;font-weight:bold;">@totalMealSold</span>
+                        </li>
+                        <li style="font-size:20px;text-align:start;">
+                            Total revenue: R
+                            <span style="font-size:20px;text-decoration:underline;font-weight:bold;">@totalRevenue</span>
+                        </li>
+                        <li style="font-size:20px;text-align:start;">
+                            Most sold meal:
+                            <span style="font-size:20px;text-decoration:underline;font-weight:bold;">@mostSold</span>
+                        </li>
+                        <li style="font-size:20px;text-align:start;">
+                            Least sold meal:
+                            <span style="font-size:20px;text-decoration:underline;font-weight:bold;">@leastSold</span>
+                        </li>
+                    </ul>
+                </div>
+
+            }
+
+            <hr class="mt-4" />
+
+            <h1 class="display-5 mt-3 text-center">Filter Data</h1>
+
+            <form class="form text-center" method="get" asp-action="FilterPurchasedMeals" asp-controller="Home">
+
+                <label for="fromDate" class="form-label mt-3" style="font-size:20px;">From date: </label>
+                <input type="datetime" id="fromDate" name="fromDate" class="form-control" required placeholder="Format: yyyy/mm/dd hr:min:sec" />
+                <label for="toDate" class="form-label mt-4" style="font-size:20px;">To date: </label>
+                <input type="datetime" id="toDate" name="toDate" class="form-control" required placeholder="Format: yyyy/mm/dd hr:min:sec" />
+                <button type="submit" class="btn btn-success mt-3" style="width:120px;"> Filter </button>
+            </form>
+
+        </div>
+    }
+}

@@ -69,50 +69,45 @@
                         </li>
                         @{
                             if (ViewData["IsLogged"] != null)
-                            {
-                                string? logged = (string?)ViewData["IsLogged"];
-                                if (logged != null && logged == "yes")
-                                { 
-                                    <li class="nav-item">
-                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="DisplayInvoice">Invoice</a>
-                                    </li>
-                                 }
+                            {                                
+                                <li class="nav-item">
+                                    <a class="anchors nav-link text-white" asp-controller="Home" asp-action="DisplayInvoice">Invoice</a>
+                                </li>                             
                             }                            
                         } 
                         @{
                             if (ViewData["IsLogged"] != null)
-                            {
-                                string? logged = (string?)ViewData["IsLogged"];
-                                if (logged != null && logged == "yes")
-                                {
-                                    <li class="nav-item">
-                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="TempOrder">Your Orders</a>
-                                    </li>
-                                }
+                            {                             
+                                <li class="nav-item">
+                                    <a class="anchors nav-link text-white" asp-controller="Home" asp-action="TempOrder">Your Orders</a>
+                                </li>                             
+                            }
+                        }
+                        @{
+                            if (ViewData["AdminLogged"] != null)
+                            {                                
+                                <li class="nav-item">
+                                    <a class="anchors nav-link text-white" asp-controller="Home" asp-action="Orders">Orders</a>
+                                </li>
+                             
                             }
                         }
                         @{
                             if (ViewData["AdminLogged"] != null)
                             {
-                                string? logged = (string?)ViewData["AdminLogged"];
-                                if (logged != null && logged == "yes")
-                                {
-                                    <li class="nav-item">
-                                        <a class="anchors nav-link text-white" asp-controller="Home" asp-action="Orders">Orders</a>
-                                    </li>
-                                }
-                            }
-                        }
-                        @{
-                            if (ViewData["AdminLogged"] != null)
-                            {
-                                string? logged = (string?)ViewData["AdminLogged"];
-                                if (logged != null && logged == "yes")
-                                {
+                            
                                     <li class="nav-item">
                                         <a class="anchors nav-link text-white" asp-controller="Home" asp-action="ViewMeals">View Meals</a>
                                     </li>
-                                }
+                            
+                            }
+                        }
+                        @{
+                            if (ViewData["AdminLogged"] != null)
+                            {                               
+                                <li class="nav-item">
+                                    <a class="anchors nav-link text-white" asp-controller="Home" asp-action="SalesReport">Sales Report</a>
+                                </li>                              
                             }
                         }
                     </ul>                   
@@ -147,11 +142,20 @@
 
     <footer class="border-top footer bg-danger text-white">
         <div class="container d-inline-flex">
-            <div class="container justify-content-start">
+            <div class="container justify-content-start" style="width:99%">
                 &copy; 2023 - DeliciousMeals
             </div>
-            <div class="container justify-content-end">
-                <a class="anchors text-white" asp-action="AdminLogin" asp-controller="Authentication">Admin Login</a>
+            <div class="container justify-content-end" style="width:1%">
+                @{
+                    if(ViewData["AdminLogged"] != null)
+                    {                        
+                        <a class="anchors text-white" asp-action="Logout" asp-controller="Authentication">Logged as Admin</a>
+                    }
+                    else
+                    {
+                        <a class="anchors text-white" asp-action="AdminLogin" asp-controller="Authentication">Admin</a>
+                    }
+                }                
             </div>
         </div>
     </footer>
